@@ -46,18 +46,18 @@ def collect_vm_metrics(vm):
         resource_utilization['cpu_metrics']['cpu_user_rate'] = '%.2f' % (0.00)
         resource_utilization['cpu_metrics']['cpu_idle_rate'] = '%.2f' % (0.00)
     mem_stats = runCmdRaiseException('virsh dommemstat %s' % vm)
-    mem_actual = 0.00
     mem_unused = 0.00
+    mem_available = 0.00
     for line in mem_stats:
-        if line.find('actual') != -1:
-            mem_actual = float(line.split(' ')[1].strip())
-            resource_utilization['mem_metrics']['mem_actual'] = '%.2f' % (mem_actual)
-        elif line.find('unused') != -1:
+        if line.find('unused') != -1:
             mem_unused = float(line.split(' ')[1].strip())
             resource_utilization['mem_metrics']['mem_unused'] = '%.2f' % (mem_unused)
-    if mem_actual and mem_unused:
+        elif line.find('available') != -1:
+            mem_available = float(line.split(' ')[1].strip())
+            resource_utilization['mem_metrics']['mem_available'] = '%.2f' % (mem_available)
+    if mem_unused and mem_available:
         resource_utilization['mem_metrics']['mem_rate'] = \
-        '%.2f' % ((mem_actual - mem_unused) / mem_actual * 100)
+        '%.2f' % ((mem_available - mem_unused) / mem_available * 100)
     else:
         resource_utilization['mem_metrics']['mem_rate'] = '%.2f' % (0.00)
     disks_spec = get_disks_spec(vm)
