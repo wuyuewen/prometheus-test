@@ -87,13 +87,13 @@ def collect_vm_metrics(vm):
                 stats2['wr_req'] = float(line.split(' ')[2].strip())
             elif line.find('wr_bytes') != -1:
                 stats2['wr_bytes'] = float(line.split(' ')[2].strip())
-        disk_metrics['disk_read_requests_per_secend'] = (stats2['rd_req'] - stats1['rd_req']) / 0.1 \
+        disk_metrics['disk_read_requests_per_secend'] = '%.2f' % ((stats2['rd_req'] - stats1['rd_req']) / 0.1) \
         if (stats2['rd_req'] - stats1['rd_req']) > 0 else '%.2f' % (0.00)
-        disk_metrics['disk_read_bytes_per_secend'] = (stats2['rd_bytes'] - stats1['rd_bytes']) / 0.1 \
+        disk_metrics['disk_read_bytes_per_secend'] = '%.2f' % ((stats2['rd_bytes'] - stats1['rd_bytes']) / 0.1) \
         if (stats2['rd_bytes'] - stats1['rd_bytes']) > 0 else '%.2f' % (0.00)
-        disk_metrics['disk_write_requests_per_secend'] = (stats2['wr_req'] - stats1['wr_req']) / 0.1 \
+        disk_metrics['disk_write_requests_per_secend'] = '%.2f' % ((stats2['wr_req'] - stats1['wr_req']) / 0.1) \
         if (stats2['wr_req'] - stats1['wr_req']) > 0 else '%.2f' % (0.00)
-        disk_metrics['disk_write_bytes_per_secend'] = (stats2['wr_bytes'] - stats1['wr_bytes']) / 0.1 \
+        disk_metrics['disk_write_bytes_per_secend'] = '%.2f' % ((stats2['wr_bytes'] - stats1['wr_bytes']) / 0.1) \
         if (stats2['wr_bytes'] - stats1['wr_bytes']) > 0 else '%.2f' % (0.00)
         resource_utilization['disks_metrics'].append(disk_metrics)
     #     vm_resource_utilization()
