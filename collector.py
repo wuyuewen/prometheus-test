@@ -14,7 +14,7 @@ vm_resource_utilization = Gauge('vm_resource_utilization', 'The resource utiliza
 def collect_vm_metrics(vm):
     resource_utilization = {'cpu_metrics': {}, 'mem_metrics': {},
                             'disks_metrics': [], 'networks_metrics': []}
-    cpus = get_vcpus(vm)
+    cpus = len(get_vcpus(vm)[0])
     print(cpus)
     cpu_stats = runCmdRaiseException('virsh cpu-stats --total %s' % vm)
     cpu_time = 0.00
