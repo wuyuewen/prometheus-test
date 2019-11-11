@@ -34,23 +34,23 @@ def collect_vm_metrics(vm):
     if resource_utilization['cpu_metrics']['cpu_user_time'] and resource_utilization['cpu_metrics']['cpu_system_time'] \
     and resource_utilization['cpu_metrics']['cpu_time']:
         resource_utilization['cpu_metrics']['cpu_rate'] = \
-        (resource_utilization['cpu_metrics']['cpu_user_time'] + resource_utilization['cpu_metrics']['cpu_system_time']) \
-        / resource_utilization['cpu_metrics']['cpu_time'] * 100
+        '%.2f' % ((resource_utilization['cpu_metrics']['cpu_user_time'] + resource_utilization['cpu_metrics']['cpu_system_time']) \
+        / resource_utilization['cpu_metrics']['cpu_time'] * 100)
     else:
-        resource_utilization['cpu_metrics']['cpu_rate'] = 0
+        resource_utilization['cpu_metrics']['cpu_rate'] = 0.00
     mem_stats = runCmdRaiseException('virsh dommemstat %s' % vm)
     for line in mem_stats:
         if line.find('actual') != -1:
-            resource_utilization['mem_metrics']['mem_actual'] = int(line.split(' ')[1].strip())
+            resource_utilization['mem_metrics']['mem_actual'] = float(line.split(' ')[1].strip())
         elif line.find('available') != -1:
-            resource_utilization['mem_metrics']['mem_available'] = int(line.split(' ')[1].strip())
+            resource_utilization['mem_metrics']['mem_available'] = float(line.split(' ')[1].strip())
         elif line.find('last_update') != -1:
-            resource_utilization['mem_metrics']['mem_last_update'] = int(line.split(' ')[1].strip())
+            resource_utilization['mem_metrics']['mem_last_update'] = float(line.split(' ')[1].strip())
     if resource_utilization['mem_metrics']['mem_available'] and resource_utilization['mem_metrics']['mem_actual']:
-        resource_utilization['mem_metrics']['mem_rate'] = (resource_utilization['mem_metrics']['mem_actual'] \
-        - resource_utilization['mem_metrics']['mem_available']) / resource_utilization['mem_metrics']['mem_actual'] * 100
+        resource_utilization['mem_metrics']['mem_rate'] = '%.2f' % ((resource_utilization['mem_metrics']['mem_actual'] \
+        - resource_utilization['mem_metrics']['mem_available']) / resource_utilization['mem_metrics']['mem_actual'] * 100)
     else:
-        resource_utilization['mem_metrics']['mem_rate'] = 0
+        resource_utilization['mem_metrics']['mem_rate'] = 0.00
     disks_spec = get_disks_spec(vm)
     for disk_spec in disks_spec:
         disk_metrics = {}
