@@ -15,40 +15,48 @@ def collect_vm_metrics(vm):
     resource_utilization = {'cpu_metrics': {}, 'mem_metrics': {},
                             'disks_metrics': [], 'networks_metrics': []}
     cpu_stats = runCmdRaiseException('virsh cpu-stats --total %s' % vm)
+    cpu_time = 0.00
+    cpu_system_time = 0.00
+    cpu_user_time = 0.00
     for line in cpu_stats:
         if line.find('cpu_time') != -1:
             p1 = r'^(\s*cpu_time\s*)([\S*]+)\s*(\S*)'
             m1 = re.match(p1, line)
             if m1:
-                resource_utilization['cpu_metrics']['cpu_time'] = '%.2f' % (float(m1.group(2)))
+                cpu_time = float(m1.group(2))
+                resource_utilization['cpu_metrics']['cpu_time'] = '%.2f' % (cpu_time)
         elif line.find('system_time') != -1:
             p1 = r'^(\s*system_time\s*)([\S*]+)\s*(\S*)'
             m1 = re.match(p1, line)
             if m1:
-                resource_utilization['cpu_metrics']['cpu_system_time'] = '%.2f' % (float(m1.group(2)))
+                cpu_system_time = float(m1.group(2))
+                resource_utilization['cpu_metrics']['cpu_system_time'] = '%.2f' % (cpu_system_time)
         elif line.find('user_time') != -1:
             p1 = r'^(\s*user_time\s*)([\S*]+)\s*(\S*)'
             m1 = re.match(p1, line)
             if m1:
-                resource_utilization['cpu_metrics']['cpu_user_time'] = '%.2f' % (float(m1.group(2)))
-    if resource_utilization['cpu_metrics']['cpu_user_time'] and resource_utilization['cpu_metrics']['cpu_system_time'] \
-    and resource_utilization['cpu_metrics']['cpu_time']:
+                cpu_user_time = float(m1.group(2))
+                resource_utilization['cpu_metrics']['cpu_user_time'] = '%.2f' % (cpu_user_time)
+    if cpu_time and cpu_system_time and cpu_user_time:
         resource_utilization['cpu_metrics']['cpu_rate'] = \
-        '%.2f' % ((resource_utilization['cpu_metrics']['cpu_user_time'] + resource_utilization['cpu_metrics']['cpu_system_time']) \
-        / resource_utilization['cpu_metrics']['cpu_time'] * 100)
+        '%.2f' % ((cpu_user_time + cpu_system_time) / cpu_time * 100)
     else:
         resource_utilization['cpu_metrics']['cpu_rate'] = 0.00
     mem_stats = runCmdRaiseException('virsh dommemstat %s' % vm)
+    mem_actual = 0.00
+    mem_available = 0.00
     for line in mem_stats:
         if line.find('actual') != -1:
-            resource_utilization['mem_metrics']['mem_actual'] = '%.2f' % (float(line.split(' ')[1].strip()))
+            mem_actual = float(line.split(' ')[1].strip())
+            resource_utilization['mem_metrics']['mem_actual'] = '%.2f' % (mem_actual)
         elif line.find('available') != -1:
-            resource_utilization['mem_metrics']['mem_available'] = '%.2f' % (float(line.split(' ')[1].strip()))
+            mem_available = float(line.split(' ')[1].strip())
+            resource_utilization['mem_metrics']['mem_available'] = '%.2f' % (mem_available)
         elif line.find('last_update') != -1:
             resource_utilization['mem_metrics']['mem_last_update'] = '%.2f' % (float(line.split(' ')[1].strip()))
-    if resource_utilization['mem_metrics']['mem_available'] and resource_utilization['mem_metrics']['mem_actual']:
-        resource_utilization['mem_metrics']['mem_rate'] = '%.2f' % ((resource_utilization['mem_metrics']['mem_actual'] \
-        - resource_utilization['mem_metrics']['mem_available']) / resource_utilization['mem_metrics']['mem_actual'] * 100)
+    if mem_actual and mem_available:
+        resource_utilization['mem_metrics']['mem_rate'] = \
+        '%.2f' % ((mem_actual - mem_available) / mem_actual * 100)
     else:
         resource_utilization['mem_metrics']['mem_rate'] = 0.00
     disks_spec = get_disks_spec(vm)
