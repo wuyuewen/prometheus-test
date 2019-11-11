@@ -47,10 +47,10 @@ def collect_vm_metrics(vm):
         elif line.find('last_update') != -1:
             resource_utilization['mem_metrics']['mem_last_update'] = int(line.split(' ')[1].strip())
     if resource_utilization['mem_metrics']['mem_available'] and resource_utilization['mem_metrics']['mem_actual']:
-        resource_utilization['cpu_metrics']['mem_rate'] = (resource_utilization['mem_metrics']['mem_actual'] \
+        resource_utilization['mem_metrics']['mem_rate'] = (resource_utilization['mem_metrics']['mem_actual'] \
         - resource_utilization['mem_metrics']['mem_available']) * 100
     else:
-        resource_utilization['cpu_metrics']['mem_rate'] = 0
+        resource_utilization['mem_metrics']['mem_rate'] = 0
     disks_spec = get_disks_spec(vm)
     for disk_spec in disks_spec:
         disk_metrics = {}
