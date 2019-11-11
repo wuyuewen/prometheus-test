@@ -509,6 +509,9 @@ def setvcpus(vm_, vcpus, config=False):
 
     return ret1 == ret2 == 0
 
+def get_vcpus(vm_):
+    dom = _get_dom(vm_)
+    return dom.vcpus()
 
 def freemem():
     '''
