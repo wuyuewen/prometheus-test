@@ -7,7 +7,6 @@ import threading
 from io import BytesIO
 from utils.utils import runCmdRaiseException
 from utils.libvirt_util import list_active_vms, get_disks_spec
-from test.test_os import resource
 
 vm_resource_utilization = Gauge('vm_resource_utilization', 'The resource utilization of virtual machine', \
                                 ['cpu_metrics', 'mem_metrics', 'disks_metrics', 'networks_metrics'])
