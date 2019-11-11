@@ -16,9 +16,9 @@ def collect_vm_metrics(vm):
     for line in cpu_stats:
         if line.find('cpu_time') != -1:
             p1 = r'^(\s*cpu_time\s*)([\S*]+)\s*(\S*)'
-            m1 = re.match(line, p1)
+            m1 = re.match(p1, line)
             if m1:
-                resource_utilization['cpu_time'] = m1.group(1)
+                resource_utilization['cpu_time'] = m1.group(2)
 #     vm_resource_utilization()
     return resource_utilization
 
