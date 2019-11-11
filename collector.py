@@ -14,8 +14,8 @@ vm_resource_utilization = Gauge('vm_resource_utilization', 'The resource utiliza
 def collect_vm_metrics(vm):
     resource_utilization = {'cpu_metrics': {}, 'mem_metrics': {},
                             'disks_metrics': [], 'networks_metrics': []}
-    cpus = len(get_vcpus(vm)[0])
-    print(cpus)
+#     cpus = len(get_vcpus(vm)[0])
+#     print(cpus)
     cpu_stats = runCmdRaiseException('virsh cpu-stats --total %s' % vm)
     cpu_time = 0.00
     cpu_system_time = 0.00
@@ -37,10 +37,10 @@ def collect_vm_metrics(vm):
             if m1:
                 cpu_user_time = float(m1.group(2))
     if cpu_time and cpu_system_time and cpu_user_time:
-        resource_utilization['cpu_metrics']['cpu_system_rate'] = '%.2f' % (cpu_system_time / cpus)
-        resource_utilization['cpu_metrics']['cpu_user_rate'] = '%.2f' % (cpu_user_time / cpus)
+        resource_utilization['cpu_metrics']['cpu_system_rate'] = '%.2f' % (cpu_system_time / cpu_time)
+        resource_utilization['cpu_metrics']['cpu_user_rate'] = '%.2f' % (cpu_user_time / cpu_time)
         resource_utilization['cpu_metrics']['cpu_idle_rate'] = \
-        '%.2f' % (100 - ((cpu_user_time + cpu_system_time) / cpus))
+        '%.2f' % (100 - ((cpu_user_time + cpu_system_time) / cpu_time))
     else:
         resource_utilization['cpu_metrics']['cpu_system_rate'] = '%.2f' % (0.00)
         resource_utilization['cpu_metrics']['cpu_user_rate'] = '%.2f' % (0.00)
