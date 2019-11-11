@@ -29,6 +29,14 @@ def collect_vm_metrics(vm):
             m1 = re.match(p1, line)
             if m1:
                 resource_utilization['cpu_user_time'] = m1.group(2)
+    mem_stats = runCmdRaiseException('virsh dommemstat %s' % vm)
+    for line in mem_stats:
+        if line.find('actual') != -1:
+            resource_utilization['mem_actual'] = line.split(' ')[1].strip()
+        elif line.find('available') != -1:
+            resource_utilization['mem_available'] = line.split(' ')[1].strip()
+        elif line.find('last_update') != -1:
+            resource_utilization['mem_last_update'] = line.split(' ')[1].strip()
 #     vm_resource_utilization()
     return resource_utilization
 
