@@ -52,8 +52,6 @@ def collect_vm_metrics(vm):
         elif line.find('available') != -1:
             mem_available = float(line.split(' ')[1].strip())
             resource_utilization['mem_metrics']['mem_available'] = '%.2f' % (mem_available)
-        elif line.find('last_update') != -1:
-            resource_utilization['mem_metrics']['mem_last_update'] = '%.2f' % (float(line.split(' ')[1].strip()))
     if mem_actual and mem_available:
         resource_utilization['mem_metrics']['mem_rate'] = \
         '%.2f' % ((mem_actual - mem_available) / mem_actual * 100)
