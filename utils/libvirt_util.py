@@ -1005,3 +1005,4 @@ if __name__ == '__main__':
 #     print(is_volume_in_use('disktest22', 'pooltest22'))
 #     vol_xml = get_vol_info_by_qemu('/var/lib/libvirt/pooltest/disktest/disktest')
 #     print vol_xml
+    print(freecpu())

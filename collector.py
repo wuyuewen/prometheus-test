@@ -30,13 +30,14 @@ def vm_collector_threads(vm):
         time.sleep(5)
 
 if __name__ == '__main__':
-    start_http_server(9092)
-    vm_list = list_active_vms()
-    threads = []
-    for url in vm_list:
-        t = threading.Thread(target=vm_collector_threads,args=(url,))
-        threads.append(t)
-    for thread in threads:
-        thread.setDaemon(True)
-        thread.start()
-    thread.join()
+#     start_http_server(9092)
+#     vm_list = list_active_vms()
+#     threads = []
+#     for url in vm_list:
+#         t = threading.Thread(target=vm_collector_threads,args=(url,))
+#         threads.append(t)
+#     for thread in threads:
+#         thread.setDaemon(True)
+#         thread.start()
+#     thread.join()
+    print(collect_vm_metrics("vm010"))
