@@ -15,6 +15,7 @@ def collect_vm_metrics(vm):
     resource_utilization = {'cpu_metrics': {}, 'mem_metrics': {},
                             'disks_metrics': [], 'networks_metrics': []}
     cpus = get_vcpus(vm)
+    print(cpus)
     cpu_stats = runCmdRaiseException('virsh cpu-stats --total %s' % vm)
     cpu_time = 0.00
     cpu_system_time = 0.00
@@ -38,12 +39,12 @@ def collect_vm_metrics(vm):
     if cpu_time and cpu_system_time and cpu_user_time:
         resource_utilization['cpu_metrics']['cpu_system_rate'] = '%.2f' % (cpu_system_time / len(cpus))
         resource_utilization['cpu_metrics']['cpu_user_rate'] = '%.2f' % (cpu_user_time / len(cpus))
-        resource_utilization['cpu_metrics']['cpu_idel_rate'] = \
+        resource_utilization['cpu_metrics']['cpu_idle_rate'] = \
         '%.2f' % (100 - ((cpu_user_time + cpu_system_time) / len(cpus)))
     else:
         resource_utilization['cpu_metrics']['cpu_system_rate'] = '%.2f' % (0.00)
         resource_utilization['cpu_metrics']['cpu_user_rate'] = '%.2f' % (0.00)
-        resource_utilization['cpu_metrics']['cpu_idel_rate'] = '%.2f' % (0.00)
+        resource_utilization['cpu_metrics']['cpu_idle_rate'] = '%.2f' % (0.00)
     mem_stats = runCmdRaiseException('virsh dommemstat %s' % vm)
     mem_actual = 0.00
     mem_unused = 0.00
