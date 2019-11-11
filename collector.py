@@ -20,17 +20,17 @@ def collect_vm_metrics(vm):
             p1 = r'^(\s*cpu_time\s*)([\S*]+)\s*(\S*)'
             m1 = re.match(p1, line)
             if m1:
-                resource_utilization['cpu_metrics']['cpu_time'] = m1.group(2)
+                resource_utilization['cpu_metrics']['cpu_time'] = int(m1.group(2))
         elif line.find('system_time') != -1:
             p1 = r'^(\s*system_time\s*)([\S*]+)\s*(\S*)'
             m1 = re.match(p1, line)
             if m1:
-                resource_utilization['cpu_metrics']['cpu_system_time'] = m1.group(2)
+                resource_utilization['cpu_metrics']['cpu_system_time'] = int(m1.group(2))
         elif line.find('user_time') != -1:
             p1 = r'^(\s*user_time\s*)([\S*]+)\s*(\S*)'
             m1 = re.match(p1, line)
             if m1:
-                resource_utilization['cpu_metrics']['cpu_user_time'] = m1.group(2)
+                resource_utilization['cpu_metrics']['cpu_user_time'] = int(m1.group(2))
     if resource_utilization['cpu_metrics']['cpu_user_time'] and resource_utilization['cpu_metrics']['cpu_system_time'] \
     and resource_utilization['cpu_metrics']['cpu_time']:
         resource_utilization['cpu_metrics']['cpu_rate'] = \
@@ -41,11 +41,11 @@ def collect_vm_metrics(vm):
     mem_stats = runCmdRaiseException('virsh dommemstat %s' % vm)
     for line in mem_stats:
         if line.find('actual') != -1:
-            resource_utilization['mem_metrics']['mem_actual'] = line.split(' ')[1].strip()
+            resource_utilization['mem_metrics']['mem_actual'] = int(line.split(' ')[1].strip())
         elif line.find('available') != -1:
-            resource_utilization['mem_metrics']['mem_available'] = line.split(' ')[1].strip()
+            resource_utilization['mem_metrics']['mem_available'] = int(line.split(' ')[1].strip())
         elif line.find('last_update') != -1:
-            resource_utilization['mem_metrics']['mem_last_update'] = line.split(' ')[1].strip()
+            resource_utilization['mem_metrics']['mem_last_update'] = int(line.split(' ')[1].strip())
     if resource_utilization['mem_metrics']['mem_available'] and resource_utilization['mem_metrics']['mem_actual']:
         resource_utilization['cpu_metrics']['mem_rate'] = (resource_utilization['mem_metrics']['mem_actual'] \
         - resource_utilization['mem_metrics']['mem_available']) * 100
@@ -112,5 +112,6 @@ if __name__ == '__main__':
 #         thread.setDaemon(True)
 #         thread.start()
 #     thread.join()
+    import pprint
     set_vm_mem_period('vm010', 5)
-    print(collect_vm_metrics("vm010"))
+    pprint.pprint(collect_vm_metrics("vm010"))
