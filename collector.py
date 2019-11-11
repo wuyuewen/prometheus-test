@@ -41,7 +41,7 @@ def collect_vm_metrics(vm):
         resource_utilization['cpu_metrics']['cpu_rate'] = \
         '%.2f' % ((cpu_user_time + cpu_system_time) / cpu_time * 100)
     else:
-        resource_utilization['cpu_metrics']['cpu_rate'] = 0.00
+        resource_utilization['cpu_metrics']['cpu_rate'] = '%.2f' % (0.00)
     mem_stats = runCmdRaiseException('virsh dommemstat %s' % vm)
     mem_actual = 0.00
     mem_available = 0.00
@@ -58,7 +58,7 @@ def collect_vm_metrics(vm):
         resource_utilization['mem_metrics']['mem_rate'] = \
         '%.2f' % ((mem_actual - mem_available) / mem_actual * 100)
     else:
-        resource_utilization['mem_metrics']['mem_rate'] = 0.00
+        resource_utilization['mem_metrics']['mem_rate'] = '%.2f' % (0.00)
     disks_spec = get_disks_spec(vm)
     for disk_spec in disks_spec:
         disk_metrics = {}
@@ -88,13 +88,13 @@ def collect_vm_metrics(vm):
             elif line.find('wr_bytes') != -1:
                 stats2['wr_bytes'] = float(line.split(' ')[2].strip())
         disk_metrics['disk_read_requests_per_secend'] = (stats2['rd_req'] - stats1['rd_req']) / 0.1 \
-        if (stats2['rd_req'] - stats1['rd_req']) >= 0 else 0.00
+        if (stats2['rd_req'] - stats1['rd_req']) > 0 else '%.2f' % (0.00)
         disk_metrics['disk_read_bytes_per_secend'] = (stats2['rd_bytes'] - stats1['rd_bytes']) / 0.1 \
-        if (stats2['rd_bytes'] - stats1['rd_bytes']) >= 0 else 0.00
+        if (stats2['rd_bytes'] - stats1['rd_bytes']) > 0 else '%.2f' % (0.00)
         disk_metrics['disk_write_requests_per_secend'] = (stats2['wr_req'] - stats1['wr_req']) / 0.1 \
-        if (stats2['wr_req'] - stats1['wr_req']) >= 0 else 0.00
+        if (stats2['wr_req'] - stats1['wr_req']) > 0 else '%.2f' % (0.00)
         disk_metrics['disk_write_bytes_per_secend'] = (stats2['wr_bytes'] - stats1['wr_bytes']) / 0.1 \
-        if (stats2['wr_bytes'] - stats1['wr_bytes']) >= 0 else 0.00
+        if (stats2['wr_bytes'] - stats1['wr_bytes']) > 0 else '%.2f' % (0.00)
         resource_utilization['disks_metrics'].append(disk_metrics)
     #     vm_resource_utilization()
     return resource_utilization
