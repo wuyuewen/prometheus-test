@@ -69,24 +69,24 @@ def collect_vm_metrics(vm):
         blk_dev_stats1 = runCmdRaiseException('virsh domblkstat --device %s --domain %s' % (disk_device, vm))
         for line in blk_dev_stats1:
             if line.find('rd_req') != -1:
-                stats1['rd_req'] = '%.2f' % (float(line.split(' ')[2].strip()))
+                stats1['rd_req'] = float(line.split(' ')[2].strip())
             elif line.find('rd_bytes') != -1:
-                stats1['rd_bytes'] = '%.2f' % (float(line.split(' ')[2].strip()))
+                stats1['rd_bytes'] = float(line.split(' ')[2].strip())
             elif line.find('wr_req') != -1:
-                stats1['wr_req'] = '%.2f' % (float(line.split(' ')[2].strip()))
+                stats1['wr_req'] = float(line.split(' ')[2].strip())
             elif line.find('wr_bytes') != -1:
-                stats1['wr_bytes'] = '%.2f' % (float(line.split(' ')[2].strip()))
+                stats1['wr_bytes'] = float(line.split(' ')[2].strip())
         time.sleep(0.1)
         blk_dev_stats2 = runCmdRaiseException('virsh domblkstat --device %s --domain %s' % (disk_device, vm))
         for line in blk_dev_stats2:
             if line.find('rd_req') != -1:
-                stats2['rd_req'] = '%.2f' % (float(line.split(' ')[2].strip()))
+                stats2['rd_req'] = float(line.split(' ')[2].strip())
             elif line.find('rd_bytes') != -1:
-                stats2['rd_bytes'] = '%.2f' % (float(line.split(' ')[2].strip()))
+                stats2['rd_bytes'] = float(line.split(' ')[2].strip())
             elif line.find('wr_req') != -1:
-                stats2['wr_req'] = '%.2f' % (float(line.split(' ')[2].strip()))
+                stats2['wr_req'] = float(line.split(' ')[2].strip())
             elif line.find('wr_bytes') != -1:
-                stats2['wr_bytes'] = '%.2f' % (float(line.split(' ')[2].strip()))
+                stats2['wr_bytes'] = float(line.split(' ')[2].strip())
         disk_metrics['disk_read_requests_per_secend'] = (stats2['rd_req'] - stats1['rd_req']) / 0.1 \
         if (stats2['rd_req'] - stats1['rd_req']) >= 0 else 0.00
         disk_metrics['disk_read_bytes_per_secend'] = (stats2['rd_bytes'] - stats1['rd_bytes']) / 0.1 \
