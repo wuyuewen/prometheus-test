@@ -18,17 +18,17 @@ def collect_vm_metrics(vm):
             p1 = r'^(\s*cpu_time\s*)([\S*]+)\s*(\S*)'
             m1 = re.match(p1, line)
             if m1:
-                resource_utilization['cpu_time'] = int(m1.group(2))
+                resource_utilization['cpu_time'] = m1.group(2)
         elif line.find('system_time') != -1:
             p1 = r'^(\s*system_time\s*)([\S*]+)\s*(\S*)'
             m1 = re.match(p1, line)
             if m1:
-                resource_utilization['cpu_system_time'] = int(m1.group(2))
+                resource_utilization['cpu_system_time'] = m1.group(2)
         elif line.find('user_time') != -1:
             p1 = r'^(\s*user_time\s*)([\S*]+)\s*(\S*)'
             m1 = re.match(p1, line)
             if m1:
-                resource_utilization['cpu_user_time'] = int(m1.group(2))
+                resource_utilization['cpu_user_time'] = m1.group(2)
     mem_stats = runCmdRaiseException('virsh dommemstat %s' % vm)
     for line in mem_stats:
         if line.find('actual') != -1:
