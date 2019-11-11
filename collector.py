@@ -31,6 +31,13 @@ def collect_vm_metrics(vm):
             m1 = re.match(p1, line)
             if m1:
                 resource_utilization['cpu_metrics']['cpu_user_time'] = m1.group(2)
+    if resource_utilization['cpu_metrics']['cpu_user_time'] and resource_utilization['cpu_metrics']['cpu_system_time'] \
+    and resource_utilization['cpu_metrics']['cpu_time']:
+        resource_utilization['cpu_metrics']['cpu_rate'] = \
+        (resource_utilization['cpu_metrics']['cpu_user_time'] + resource_utilization['cpu_metrics']['cpu_system_time']) \
+        / resource_utilization['cpu_metrics']['cpu_time'] * 100
+    else:
+        resource_utilization['cpu_metrics']['cpu_rate'] = 0
     mem_stats = runCmdRaiseException('virsh dommemstat %s' % vm)
     for line in mem_stats:
         if line.find('actual') != -1:
@@ -39,6 +46,11 @@ def collect_vm_metrics(vm):
             resource_utilization['mem_metrics']['mem_available'] = line.split(' ')[1].strip()
         elif line.find('last_update') != -1:
             resource_utilization['mem_metrics']['mem_last_update'] = line.split(' ')[1].strip()
+    if resource_utilization['mem_metrics']['mem_available'] and resource_utilization['mem_metrics']['mem_actual']:
+        resource_utilization['cpu_metrics']['mem_rate'] = (resource_utilization['mem_metrics']['mem_actual'] \
+        - resource_utilization['mem_metrics']['mem_available']) * 100
+    else:
+        resource_utilization['cpu_metrics']['mem_rate'] = 0
     disks_spec = get_disks_spec(vm)
     for disk_spec in disks_spec:
         disk_metrics = {}
@@ -79,6 +91,9 @@ def collect_vm_metrics(vm):
     #     vm_resource_utilization()
     return resource_utilization
 
+def set_vm_mem_period(vm, sec):
+    runCmdRaiseException('virsh dommemstat --period %s --domain %s --config --live' % (str(sec), vm))
+
 def vm_collector_threads(vm):
     while True:
         t = threading.Thread(target=collect_vm_metrics,args=(vm,))
@@ -97,4 +112,5 @@ if __name__ == '__main__':
 #         thread.setDaemon(True)
 #         thread.start()
 #     thread.join()
+    set_vm_mem_period('vm010', 5)
     print(collect_vm_metrics("vm010"))
