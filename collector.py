@@ -36,10 +36,10 @@ def collect_vm_metrics(vm):
             if m1:
                 cpu_user_time = float(m1.group(2))
     if cpu_time and cpu_system_time and cpu_user_time:
-        resource_utilization['cpu_metrics']['cpu_system_rate'] = '%.2f' % (cpu_system_time / int(cpus))
-        resource_utilization['cpu_metrics']['cpu_user_rate'] = '%.2f' % (cpu_user_time / int(cpus))
+        resource_utilization['cpu_metrics']['cpu_system_rate'] = '%.2f' % (cpu_system_time / len(cpus))
+        resource_utilization['cpu_metrics']['cpu_user_rate'] = '%.2f' % (cpu_user_time / len(cpus))
         resource_utilization['cpu_metrics']['cpu_idel_rate'] = \
-        '%.2f' % (100 - ((cpu_user_time + cpu_system_time) / int(cpus)))
+        '%.2f' % (100 - ((cpu_user_time + cpu_system_time) / len(cpus)))
     else:
         resource_utilization['cpu_metrics']['cpu_system_rate'] = '%.2f' % (0.00)
         resource_utilization['cpu_metrics']['cpu_user_rate'] = '%.2f' % (0.00)
