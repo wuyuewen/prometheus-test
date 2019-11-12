@@ -6,7 +6,7 @@ import time
 import threading
 from io import BytesIO
 from utils.utils import runCmdRaiseException
-from utils.libvirt_util import list_active_vms, get_disks_spec, get_vcpus
+from utils.libvirt_util import list_active_vms, get_disks_spec, get_vcpus, get_macs
 
 vm_resource_utilization = Gauge('vm_resource_utilization', 'The resource utilization of virtual machine', \
                                 ['cpu_metrics', 'mem_metrics', 'disks_metrics', 'networks_metrics'])
@@ -103,6 +103,67 @@ def collect_vm_metrics(vm):
         disk_metrics['disk_write_bytes_per_secend'] = '%.2f' % ((stats2['wr_bytes'] - stats1['wr_bytes']) / 0.1) \
         if (stats2['wr_bytes'] - stats1['wr_bytes']) > 0 else '%.2f' % (0.00)
         resource_utilization['disks_metrics'].append(disk_metrics)
+    macs = get_macs(vm)
+    for mac in macs:
+        net_metrics = {}
+        net_metrics['device'] = mac
+        stats1 = {}
+        stats2 = {}
+        net_dev_stats1 = runCmdRaiseException('virsh domifstat --interface %s --domain %s' % (mac, vm))
+        for line in net_dev_stats1:
+            if line.find('rx_bytes') != -1:
+                stats1['rx_bytes'] = float(line.split(' ')[2].strip())
+            elif line.find('rx_packets') != -1:
+                stats1['rx_packets'] = float(line.split(' ')[2].strip())
+            elif line.find('tx_packets') != -1:
+                stats1['tx_packets'] = float(line.split(' ')[2].strip())
+            elif line.find('tx_bytes') != -1:
+                stats1['tx_bytes'] = float(line.split(' ')[2].strip())
+            elif line.find('rx_drop') != -1:
+                stats1['rx_drop'] = float(line.split(' ')[2].strip())
+            elif line.find('rx_errs') != -1:
+                stats1['rx_errs'] = float(line.split(' ')[2].strip())
+            elif line.find('tx_errs') != -1:
+                stats1['tx_errs'] = float(line.split(' ')[2].strip())
+            elif line.find('tx_drop') != -1:
+                stats1['tx_drop'] = float(line.split(' ')[2].strip())
+        time.sleep(0.1)
+        net_dev_stats2 = runCmdRaiseException('virsh domifstat --interface %s --domain %s' % (mac, vm))
+        for line in net_dev_stats2:
+            if line.find('rx_bytes') != -1:
+                stats2['rx_bytes'] = float(line.split(' ')[2].strip())
+            elif line.find('rx_packets') != -1:
+                stats2['rx_packets'] = float(line.split(' ')[2].strip())
+            elif line.find('tx_packets') != -1:
+                stats2['tx_packets'] = float(line.split(' ')[2].strip())
+            elif line.find('tx_bytes') != -1:
+                stats2['tx_bytes'] = float(line.split(' ')[2].strip())
+            elif line.find('rx_drop') != -1:
+                stats2['rx_drop'] = float(line.split(' ')[2].strip())
+            elif line.find('rx_errs') != -1:
+                stats2['rx_errs'] = float(line.split(' ')[2].strip())
+            elif line.find('tx_errs') != -1:
+                stats2['tx_errs'] = float(line.split(' ')[2].strip())
+            elif line.find('tx_drop') != -1:
+                stats2['tx_drop'] = float(line.split(' ')[2].strip())
+        net_metrics['network_read_packages_per_secend'] = '%.2f' % ((stats2['rx_packets'] - stats1['rx_packets']) / 0.1) \
+        if (stats2['rx_packets'] - stats1['rx_packets']) > 0 else '%.2f' % (0.00)
+        net_metrics['network_read_bytes_per_secend'] = '%.2f' % ((stats2['rx_bytes'] - stats1['rx_bytes']) / 0.1) \
+        if (stats2['rx_bytes'] - stats1['rx_bytes']) > 0 else '%.2f' % (0.00)
+        net_metrics['network_write_packages_per_secend'] = '%.2f' % ((stats2['tx_packets'] - stats1['tx_packets']) / 0.1) \
+        if (stats2['tx_packets'] - stats1['tx_packets']) > 0 else '%.2f' % (0.00)
+        net_metrics['network_write_bytes_per_secend'] = '%.2f' % ((stats2['tx_bytes'] - stats1['tx_bytes']) / 0.1) \
+        if (stats2['tx_bytes'] - stats1['tx_bytes']) > 0 else '%.2f' % (0.00)
+        resource_utilization['networks_metrics'].append(net_metrics)   
+        net_metrics['network_read_errors_per_secend'] = '%.2f' % ((stats2['rx_errs'] - stats1['rx_errs']) / 0.1) \
+        if (stats2['rx_errs'] - stats1['rx_errs']) > 0 else '%.2f' % (0.00)
+        net_metrics['network_read_drops_per_secend'] = '%.2f' % ((stats2['rx_drop'] - stats1['rx_drop']) / 0.1) \
+        if (stats2['rx_drop'] - stats1['rx_drop']) > 0 else '%.2f' % (0.00)
+        net_metrics['network_write_errors_per_secend'] = '%.2f' % ((stats2['tx_errs'] - stats1['tx_errs']) / 0.1) \
+        if (stats2['tx_errs'] - stats1['tx_errs']) > 0 else '%.2f' % (0.00)
+        net_metrics['network_write_drops_per_secend'] = '%.2f' % ((stats2['tx_drop'] - stats1['tx_drop']) / 0.1) \
+        if (stats2['tx_drop'] - stats1['tx_drop']) > 0 else '%.2f' % (0.00)
+        resource_utilization['networks_metrics'].append(net_metrics)   
     #     vm_resource_utilization()
     return resource_utilization
 
