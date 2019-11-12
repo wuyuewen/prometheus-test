@@ -154,7 +154,6 @@ def collect_vm_metrics(vm):
         if (stats2['tx_packets'] - stats1['tx_packets']) > 0 else '%.2f' % (0.00)
         net_metrics['network_write_bytes_per_secend'] = '%.2f' % ((stats2['tx_bytes'] - stats1['tx_bytes']) / 0.1) \
         if (stats2['tx_bytes'] - stats1['tx_bytes']) > 0 else '%.2f' % (0.00)
-        resource_utilization['networks_metrics'].append(net_metrics)   
         net_metrics['network_read_errors_per_secend'] = '%.2f' % ((stats2['rx_errs'] - stats1['rx_errs']) / 0.1) \
         if (stats2['rx_errs'] - stats1['rx_errs']) > 0 else '%.2f' % (0.00)
         net_metrics['network_read_drops_per_secend'] = '%.2f' % ((stats2['rx_drop'] - stats1['rx_drop']) / 0.1) \
