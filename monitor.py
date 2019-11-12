@@ -227,7 +227,8 @@ def collect_vm_metrics(vm):
 def set_vm_mem_period(vm, sec):
     runCmdRaiseException('virsh dommemstat --period %s --domain %s --config --live' % (str(sec), vm))
 
-def get_vm_collector_threads():
+def main():
+    start_http_server(19998)
     while True:
         vm_list = list_active_vms()
         for vm in vm_list:
@@ -238,15 +239,7 @@ def get_vm_collector_threads():
         time.sleep(5)
         
 if __name__ == '__main__':
-    start_http_server(19998)
-    thread = threading.Thread(target=get_vm_collector_threads,args=())
-    try:
-        thread.setDaemon(True)
-        thread.start()
-    except KeyboardInterrupt:
-        thread.__stop()
-        thread.__delete()
-    thread.join()
+    main()
 #     import pprint
 #     set_vm_mem_period('vm010', 5)
 #     pprint.pprint(collect_vm_metrics("vm010"))
