@@ -9,10 +9,10 @@ from utils.utils import runCmdRaiseException
 from utils.libvirt_util import list_active_vms, get_disks_spec, get_vcpus, get_macs
 
 vm_resource_utilization = Gauge('vm_resource_utilization', 'The resource utilization of virtual machine', \
-                                ['cpu_metrics', 'mem_metrics', 'disks_metrics', 'networks_metrics'])
+                                ['vm', 'cpu_metrics', 'mem_metrics', 'disks_metrics', 'networks_metrics'])
 
 def collect_vm_metrics(vm):
-    resource_utilization = {'cpu_metrics': {}, 'mem_metrics': {},
+    resource_utilization = {'vm': vm, 'cpu_metrics': {}, 'mem_metrics': {},
                             'disks_metrics': [], 'networks_metrics': []}
 #     cpus = len(get_vcpus(vm)[0])
 #     print(cpus)
@@ -162,31 +162,30 @@ def collect_vm_metrics(vm):
         if (stats2['tx_errs'] - stats1['tx_errs']) > 0 else '%.2f' % (0.00)
         net_metrics['network_write_drops_per_secend'] = '%.2f' % ((stats2['tx_drop'] - stats1['tx_drop']) / 0.1) \
         if (stats2['tx_drop'] - stats1['tx_drop']) > 0 else '%.2f' % (0.00)
-        resource_utilization['networks_metrics'].append(net_metrics)   
-    #     vm_resource_utilization()
+        resource_utilization['networks_metrics'].append(net_metrics)  
+        vm_resource_utilization.set(resource_utilization.get('vm'), resource_utilization.get('cpu_metrics'), \
+                                    resource_utilization.get('mem_metrics'), resource_utilization.get('disks_metrics'), \
+                                    resource_utilization.get('networks_metrics'))
     return resource_utilization
 
 def set_vm_mem_period(vm, sec):
     runCmdRaiseException('virsh dommemstat --period %s --domain %s --config --live' % (str(sec), vm))
 
-def vm_collector_threads(vm):
+def get_vm_collector_threads():
     while True:
-        t = threading.Thread(target=collect_vm_metrics,args=(vm,))
-        t.setDaemon(True)
-        t.start()
+        vm_list = list_active_vms()
+        for vm in vm_list:
+            t = threading.Thread(target=collect_vm_metrics,args=(vm,))
+            t.setDaemon(True)
+            t.start()
         time.sleep(5)
-
+        
 if __name__ == '__main__':
-#     start_http_server(9092)
-#     vm_list = list_active_vms()
-#     threads = []
-#     for url in vm_list:
-#         t = threading.Thread(target=vm_collector_threads,args=(url,))
-#         threads.append(t)
-#     for thread in threads:
-#         thread.setDaemon(True)
-#         thread.start()
-#     thread.join()
-    import pprint
-    set_vm_mem_period('vm010', 5)
-    pprint.pprint(collect_vm_metrics("vm010"))
+    start_http_server(19998)
+    thread = threading.Thread(target=get_vm_collector_threads,args=())
+    thread.setDaemon(True)
+    thread.start()
+    thread.join()
+#     import pprint
+#     set_vm_mem_period('vm010', 5)
+#     pprint.pprint(collect_vm_metrics("vm010"))
