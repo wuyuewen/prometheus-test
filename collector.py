@@ -245,6 +245,7 @@ if __name__ == '__main__':
         thread.start()
     except KeyboardInterrupt:
         thread.__stop()
+        thread.__delete()
     thread.join()
 #     import pprint
 #     set_vm_mem_period('vm010', 5)
