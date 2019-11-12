@@ -106,7 +106,7 @@ def collect_vm_metrics(vm):
     macs = get_macs(vm)
     for mac in macs:
         net_metrics = {}
-        net_metrics['device'] = mac
+        net_metrics['device'] = mac.decode('utf-8')
         stats1 = {}
         stats2 = {}
         net_dev_stats1 = runCmdRaiseException('virsh domifstat --interface %s --domain %s' % (mac, vm))
