@@ -163,9 +163,9 @@ def collect_vm_metrics(vm):
         net_metrics['network_write_drops_per_secend'] = '%.2f' % ((stats2['tx_drop'] - stats1['tx_drop']) / 0.1) \
         if (stats2['tx_drop'] - stats1['tx_drop']) > 0 else '%.2f' % (0.00)
         resource_utilization['networks_metrics'].append(net_metrics)  
-        vm_resource_utilization.set(resource_utilization.get('vm'), resource_utilization.get('cpu_metrics'), \
+        vm_resource_utilization.set([resource_utilization.get('vm'), resource_utilization.get('cpu_metrics'), \
                                     resource_utilization.get('mem_metrics'), resource_utilization.get('disks_metrics'), \
-                                    resource_utilization.get('networks_metrics'))
+                                    resource_utilization.get('networks_metrics')])
     return resource_utilization
 
 def set_vm_mem_period(vm, sec):
@@ -182,9 +182,12 @@ def get_vm_collector_threads():
         
 if __name__ == '__main__':
     start_http_server(19998)
-    thread = threading.Thread(target=get_vm_collector_threads,args=())
-    thread.setDaemon(True)
-    thread.start()
+    try:
+        thread = threading.Thread(target=get_vm_collector_threads,args=())
+        thread.setDaemon(True)
+        thread.start()
+    except KeyboardInterrupt:
+        thread.stop()
     thread.join()
 #     import pprint
 #     set_vm_mem_period('vm010', 5)
